@@ -2065,7 +2065,7 @@ and rewrite link paths to make blogging more seamless."
     (cond
      ;; Link type is handled by a special function.
      ((org-export-custom-protocol-maybe link desc 'md))
-     ((member type '("custom-id" "id" "fuzzy"))
+     ((member type '("custom-id" "fuzzy"))
       (let ((destination (if (string= type "fuzzy")
                              (org-export-resolve-fuzzy-link link info)
                            (org-export-resolve-id-link link info))))
@@ -2267,6 +2267,13 @@ and rewrite link paths to make blogging more seamless."
                                                              name val))))))
                 ;; (message "[org-hugo-link DBG] figure params: %s" figure-param-str)
                 (format "{{< figure %s >}}" (org-trim figure-param-str)))))))))
+     ((equal type "id")
+      (let ((description (org-string-nw-p desc))
+            (path (org-hugo--attachment-rewrite-maybe raw-path info)))
+        (format "[%s]({{< relref \"%s\" >}})"
+                description
+                (file-name-sans-extension
+                 (file-name-nondirectory (car (org-id-find raw-path)))))))
      ((string= type "coderef")
       (let ((ref (org-element-property :path link)))
         (format (org-export-get-coderef-format ref desc)
